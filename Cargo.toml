@@ -1,0 +1,19 @@
+[package]
+name = "pipeacl"
+version = "0.1.0"
+edition = "2021"
+description = "Enumerate Windows named pipes and their writable DACLs"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = [
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_Security_Authorization",
+    "Win32_Storage_FileSystem",
+    "Win32_System_Memory",
+] }
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true

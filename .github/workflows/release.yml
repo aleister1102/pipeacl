@@ -1,0 +1,42 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Rust
+        uses: dtolnay/rust-action@stable
+        
+      - name: Build release
+        run: cargo build --release
+        
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeacl-windows
+          path: target/release/pipeacl.exe
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: pipeacl-windows
+          
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: pipeacl.exe
