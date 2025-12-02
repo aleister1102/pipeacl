@@ -16,7 +16,6 @@ use windows_sys::Win32::Foundation::*;
 use windows_sys::Win32::Security::Authorization::*;
 use windows_sys::Win32::Security::*;
 use windows_sys::Win32::Storage::FileSystem::*;
-use windows_sys::Win32::System::Memory::LocalFree;
 
 const WRITABLE_MASK: u32 = GENERIC_WRITE | WRITE_DAC | WRITE_OWNER | FILE_WRITE_DATA;
 
@@ -207,7 +206,7 @@ fn analyze_dacl(dacl: *mut ACL, sid_cache: &mut HashMap<String, String>) -> (boo
             let ace_header = ace as *const ACE_HEADER;
             let ace_type = (*ace_header).AceType;
 
-            if ace_type == ACCESS_ALLOWED_ACE_TYPE as u8 {
+            if ace_type == 0x00 {  // ACCESS_ALLOWED_ACE_TYPE
                 let allowed_ace = ace as *const ACCESS_ALLOWED_ACE;
                 let mask = (*allowed_ace).Mask;
                 let sid = &(*allowed_ace).SidStart as *const u32 as PSID;
@@ -311,7 +310,7 @@ fn get_sddl_string(sd: *const SECURITY_DESCRIPTOR) -> String {
         let mut sddl_len: u32 = 0;
 
         if ConvertSecurityDescriptorToStringSecurityDescriptorW(
-            sd as *const _,
+            sd as *mut _,
             SDDL_REVISION_1,
             DACL_SECURITY_INFORMATION,
             &mut sddl,
