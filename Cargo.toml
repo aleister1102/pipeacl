@@ -1,6 +1,6 @@
 [package]
 name = "pipeacl"
-version = "0.1.0"
+version = "0.1.5"
 edition = "2021"
 description = "Enumerate Windows named pipes and their writable DACLs"
 
