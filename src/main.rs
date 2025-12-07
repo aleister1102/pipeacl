@@ -1,5 +1,12 @@
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+
 #[cfg(not(windows))]
 fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() > 1 && (args[1] == "-v" || args[1] == "--version") {
+        println!("pipeacl {}", VERSION);
+        return;
+    }
     eprintln!("pipeacl is Windows-only");
     std::process::exit(1);
 }
@@ -71,6 +78,10 @@ fn parse_args() -> Args {
     let mut args = Args::default();
     for arg in std::env::args().skip(1) {
         match arg.as_str() {
+            "--version" => {
+                println!("pipeacl {}", env!("CARGO_PKG_VERSION"));
+                std::process::exit(0);
+            }
             "-v" => args.verbose = true,
             "-j" => args.json = true,
             "-f" => args.filter_writable = true,
